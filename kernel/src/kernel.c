@@ -1,3 +1,4 @@
-int _start() {
-    return 0;
+#include "drivers/FrameBuffer.h"
+
+void _start(framebuffer_t* lfb) {
 }

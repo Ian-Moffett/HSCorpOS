@@ -3,6 +3,35 @@
 #include <elf.h>
 #include <stddef.h>
 
+typedef struct {
+    void* baseAddr;
+    size_t bufferSize;
+    unsigned int width;
+    unsigned int height;
+    unsigned int ppsl;      // Pixels per scanline.
+} framebuffer_t;
+
+
+framebuffer_t* initGOP(EFI_SYSTEM_TABLE* sysTable) {
+    EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+    EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
+
+    EFI_STATUS s = uefi_call_wrapper(BS->LocateProtocol, 3, &gopGuid, NULL, (void**)&gop);
+
+    if (EFI_ERROR(s)) {
+        return NULL;
+    }
+
+    framebuffer_t* linearFrameBuffer;
+    sysTable->BootServices->AllocatePool(EfiLoaderData, sizeof(framebuffer_t), (void**)&linearFrameBuffer);
+    linearFrameBuffer->baseAddr = (void*)gop->Mode->FrameBufferBase;
+    linearFrameBuffer->bufferSize = gop->Mode->FrameBufferSize;
+    linearFrameBuffer->width = gop->Mode->Info->HorizontalResolution;
+    linearFrameBuffer->height = gop->Mode->Info->VerticalResolution;
+    linearFrameBuffer->ppsl = gop->Mode->Info->PixelsPerScanLine;
+    return linearFrameBuffer;
+}
+
 
 int memcmp(const void* aptr, const void* bptr, size_t n) {
 	const unsigned char* a = aptr, *b = bptr;
@@ -75,8 +104,13 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* sysTable) {
                 }
             }
 
-            int(*kernel_entry)() = ((__attribute__((sysv_abi))int(*)())kernelHeader.e_entry);
-            Print(L"Kernel returned: %d\n", kernel_entry());
+            framebuffer_t* lfb = initGOP(sysTable);
+            #ifdef HSCORPOS_DUMP_LFB_INFO
+            Print(L"LFB_BASE_ADDR => 0x%X\nLFB_WIDTH => %d\nLFB_HEIGHT: => %d\n", (UINTN)lfb->baseAddr, lfb->width, lfb->height);
+            #endif 
+
+            void(*kernel_entry)(framebuffer_t*) = ((__attribute__((sysv_abi))void(*)(framebuffer_t*))kernelHeader.e_entry);
+            kernel_entry(lfb);
         }
 
     }
