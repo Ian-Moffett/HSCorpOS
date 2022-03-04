@@ -32,11 +32,10 @@ typedef struct {
     unsigned int y;
     framebuffer_t* lfb;
     psf1_font_t* font;
-    unsigned int color;
 } canvas_t;
 
 
 void putChar(framebuffer_t* framebuffer, psf1_font_t* psf1_font, unsigned int color, char chr, unsigned int xOff, unsigned int yOff);
-void kwrite(canvas_t* canvas, char* str);
+void kwrite(canvas_t* canvas, const char* const STR, unsigned int color);
 
 #endif
