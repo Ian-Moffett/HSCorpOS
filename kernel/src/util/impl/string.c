@@ -1,5 +1,7 @@
-
 #include "../string.h"
+
+void __stack_chk_fail() {
+}
 
 char res[25];
 
