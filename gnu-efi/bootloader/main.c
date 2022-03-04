@@ -3,6 +3,9 @@
 #include <elf.h>
 #include <stddef.h>
 
+#define PSF1_MAGIC0 0x00000036
+#define PSF1_MAGIC1 0x00000036
+
 typedef struct {
     void* baseAddr;
     size_t bufferSize;
@@ -10,6 +13,20 @@ typedef struct {
     unsigned int height;
     unsigned int ppsl;      // Pixels per scanline.
 } framebuffer_t;
+
+
+typedef struct {
+    unsigned char magic[2];
+    unsigned char mode;
+    unsigned char chsize;
+} psf1_header_t;
+
+
+typedef struct {
+    psf1_header_t* header;
+    void* glyphBuffer;
+} psf1_font_t;
+
 
 
 framebuffer_t* initGOP(EFI_SYSTEM_TABLE* sysTable) {
@@ -64,6 +81,42 @@ EFI_FILE* loadFile(EFI_FILE* directory, CHAR16* path, EFI_HANDLE imageHandle, EF
     return fileres;
 }
 
+psf1_font_t* load_psf1_font(EFI_FILE* dir, CHAR16* path, EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* systable) {
+    EFI_FILE* font = loadFile(dir, path, imageHandle, systable);
+
+    if (!(font)) {
+        return NULL;    // File does not exist.
+    }
+
+    psf1_header_t* fontHeader;
+    systable->BootServices->AllocatePool(EfiLoaderData, sizeof(psf1_header_t), (void**)&fontHeader);   // Allocate memory for header.
+    UINTN size = sizeof(psf1_header_t);
+    font->Read(font, &size, fontHeader);
+
+    if (!(fontHeader->magic[0] & PSF1_MAGIC0) || !(fontHeader->magic[1] & PSF1_MAGIC1)) {
+        return NULL;   // Format bad.
+    }
+
+    UINTN glyphBuffersize = fontHeader->chsize * 256;
+
+    if (fontHeader->mode == 1) {
+        glyphBuffersize = fontHeader->chsize * 512;
+    }
+
+    void* glyphBuffer;
+    font->SetPosition(font, sizeof(psf1_header_t));
+    systable->BootServices->AllocatePool(EfiLoaderData, glyphBuffersize, (void**)&glyphBuffer);
+    font->Read(font, &glyphBuffersize, glyphBuffer);
+
+    psf1_font_t* fontRes;
+    systable->BootServices->AllocatePool(EfiLoaderData, sizeof(psf1_font_t), (void**)&fontRes);
+
+    fontRes->header = fontHeader;
+    fontRes->glyphBuffer = glyphBuffer;
+    return fontRes;
+}
+
+
 EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* sysTable) {
     InitializeLib(imageHandle, sysTable);
     EFI_FILE* kernel = loadFile(NULL, L"kernel.elf", imageHandle, sysTable);
@@ -109,8 +162,14 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* sysTable) {
             Print(L"LFB_BASE_ADDR => 0x%X\nLFB_WIDTH => %d\nLFB_HEIGHT: => %d\n", (UINTN)lfb->baseAddr, lfb->width, lfb->height);
             #endif 
 
-            void(*kernel_entry)(framebuffer_t*) = ((__attribute__((sysv_abi))void(*)(framebuffer_t*))kernelHeader.e_entry);
-            kernel_entry(lfb);
+            void(*kernel_entry)(framebuffer_t*, psf1_font_t*) = ((__attribute__((sysv_abi))void(*)(framebuffer_t*, psf1_font_t*))kernelHeader.e_entry);
+                psf1_font_t* defaultFont = load_psf1_font(NULL, L"zap-light16.psf", imageHandle, sysTable);
+
+            if (defaultFont != NULL) {
+                kernel_entry(lfb, defaultFont);
+            } else {
+                Print(L"FONT_LOAD_FAILURE.\n");
+            }
         }
 
     }
