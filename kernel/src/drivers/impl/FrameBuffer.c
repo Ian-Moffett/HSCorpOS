@@ -14,3 +14,8 @@ void putChar(framebuffer_t* framebuffer, psf1_font_t* psf1_font, unsigned int co
         fontPtr++;
     }
 }
+
+
+
+void kwrite(canvas_t* canvas, char* str) {
+}

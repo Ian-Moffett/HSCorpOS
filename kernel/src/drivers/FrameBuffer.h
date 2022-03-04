@@ -2,6 +2,7 @@
 #define FRAMEBUFFER_H
 
 #include <stddef.h>
+#include "../util/string.h"
 
 
 typedef struct {
@@ -26,6 +27,16 @@ typedef struct {
 } psf1_font_t;
 
 
+typedef struct {
+    unsigned int x;
+    unsigned int y;
+    framebuffer_t* lfb;
+    psf1_font_t* font;
+    unsigned int color;
+} canvas_t;
+
+
 void putChar(framebuffer_t* framebuffer, psf1_font_t* psf1_font, unsigned int color, char chr, unsigned int xOff, unsigned int yOff);
+void kwrite(canvas_t* canvas, char* str);
 
 #endif
