@@ -49,7 +49,7 @@ char* dec2str(int dec) {
     unsigned char rl = 1;
 
     for (int i = 0; i < strlen(res) && rl; ++i) {
-        if (res[i] < '0'  || res[i] > '9') {
+        if (res[i] < '0' && res[i] > '9') {
             rl = 0;
             const char* const ERR = "UNKNOWN";
 

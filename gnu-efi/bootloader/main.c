@@ -28,6 +28,12 @@ typedef struct {
 } psf1_font_t;
 
 
+typedef struct {
+    EFI_MEMORY_DESCRIPTOR* mMap;
+    UINTN mMapSize;
+    UINTN mMapDescriptorSize;
+} meminfo_t;
+
 
 framebuffer_t* initGOP(EFI_SYSTEM_TABLE* sysTable) {
     EFI_GUID gopGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
@@ -162,11 +168,26 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* sysTable) {
             Print(L"LFB_BASE_ADDR => 0x%X\nLFB_WIDTH => %d\nLFB_HEIGHT: => %d\n", (UINTN)lfb->baseAddr, lfb->width, lfb->height);
             #endif 
 
-            void(*kernel_entry)(framebuffer_t*, psf1_font_t*) = ((__attribute__((sysv_abi))void(*)(framebuffer_t*, psf1_font_t*))kernelHeader.e_entry);
-                psf1_font_t* defaultFont = load_psf1_font(NULL, L"zap-light16.psf", imageHandle, sysTable);
+            void(*kernel_entry)(framebuffer_t*, psf1_font_t*, meminfo_t meminfo) = ((__attribute__((sysv_abi))void(*)(framebuffer_t*, psf1_font_t*, meminfo_t meminfo))kernelHeader.e_entry);
+            psf1_font_t* defaultFont = load_psf1_font(NULL, L"zap-light16.psf", imageHandle, sysTable);
+
+            EFI_MEMORY_DESCRIPTOR* mMap = NULL;
+            UINTN mMapSize, mMapKey, mMapDescSize;
+            UINT32 descriptorVersion;
+
+            sysTable->BootServices->GetMemoryMap(&mMapSize, mMap, &mMapKey, &mMapDescSize, &descriptorVersion);
+            sysTable->BootServices->AllocatePool(EfiLoaderData, mMapSize, (void**)&mMap);
+            sysTable->BootServices->GetMemoryMap(&mMapSize, mMap, &mMapKey, &mMapDescSize, &descriptorVersion);
+
+            meminfo_t meminfo = {
+                .mMap = mMap,
+                .mMapSize = mMapSize,
+                .mMapDescriptorSize = mMapDescSize
+            };
+
 
             if (defaultFont != NULL) {
-                kernel_entry(lfb, defaultFont);
+                kernel_entry(lfb, defaultFont, meminfo);
             } else {
                 Print(L"FONT_LOAD_FAILURE.\n");
             }
