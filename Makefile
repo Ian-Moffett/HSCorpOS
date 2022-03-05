@@ -6,3 +6,6 @@ run:
 
 nfs:
 	cd kernel/; make run_no_fs
+
+burndanger:
+	dd if=kernel/bin/HSCorpOS.img of=/dev/sdb status=progress
