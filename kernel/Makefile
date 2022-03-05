@@ -1,4 +1,4 @@
-OSNAME = KessOS
+OSNAME = HSCorpOS
 
 GNUEFI = ../gnu-efi
 OVMFDIR = ../OVMFbin
