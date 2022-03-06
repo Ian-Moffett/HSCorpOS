@@ -12,13 +12,8 @@ canvas_t defaultcanvas = {
     .prevX = 10,
 };
 
-__attribute__((interrupt)) void loop(int_frame_t*) {
-    while(1);
-}
 
 void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
-    // clearScreen(&defaultcanvas, 0x00000000);
-
     gdt_desc_t gdt_desc;
     gdt_desc.offset = (uint64_t)&gdt;
     gdt_desc.size = sizeof(gdt) - 1;
@@ -26,10 +21,8 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     loadGdt(&gdt_desc);
 
 
-    set_idt_entry(0x0, loop, TRAP_GATE_FLAGS);
+    set_idt_entry(0x0, div_0_handler, TRAP_GATE_FLAGS);
     idt_install();
-
-    if (0 / 0 == 0) {}
 
     defaultcanvas.lfb = lfb;
     defaultcanvas.font = font; 
