@@ -17,5 +17,4 @@ loadGdt:
     retfq
 
 done:
-    cli
     jmp rdi
