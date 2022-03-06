@@ -53,6 +53,8 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     }
 
     // INTERRUPT ZONE.
+    
+    if (0 / 0 == 1);
 
     __asm__ __volatile__("cli; hlt");
 }
