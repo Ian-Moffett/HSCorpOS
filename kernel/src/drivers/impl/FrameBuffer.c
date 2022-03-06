@@ -46,4 +46,8 @@ void clearScreen(canvas_t* canvas, unsigned int color) {
             *pixelPtr = color;
         }
     }
+
+    canvas->prevX = 10;
+    canvas->x = 10;
+    canvas->y = 10;
 }

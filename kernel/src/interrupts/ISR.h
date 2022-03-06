@@ -5,7 +5,6 @@
 #include "../drivers/FrameBuffer.h"
 
 // Interrupt attribute makes function use IRET.
-__attribute__((interrupt)) void div_0_handler(int_frame_t* int_frame);
-
+__attribute__((interrupt)) void div0_handler(int_frame_t* frame);
 
 #endif

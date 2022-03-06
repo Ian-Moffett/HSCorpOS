@@ -15,11 +15,6 @@ canvas_t defaultcanvas = {
 void test() {
 }
 
-__attribute__((interrupt)) void dmmy_div0(int_frame_t*) {
-    clearScreen(&defaultcanvas, 0xFFFFFFFF);
-    __asm__ __volatile__("cli; hlt");    
-}
-
 
 __attribute__((interrupt)) void dmmy_gpf_handler(int_frame_t*) { 
     clearScreen(&defaultcanvas, 0xFFFFFFFF);
@@ -36,7 +31,7 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     loadGdt(&gdt_desc);
 
     set_idt_entry(0xD, dmmy_gpf_handler, TRAP_GATE_FLAGS);
-    set_idt_entry(0x0, dmmy_div0, TRAP_GATE_FLAGS);
+    set_idt_entry(0x0, div0_handler, TRAP_GATE_FLAGS);
     idt_install();
 
     // __asm__ __volatile__("int $0x0");
@@ -45,7 +40,10 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     defaultcanvas.font = font; 
 
     uint64_t mMapEntries = mem_info.mMapSize / mem_info.mMapDescSize;
-        
+
+    
+    kwrite(&defaultcanvas, "\n", 0xFFFFFFFF);
+
     for (int i = 0; i < mMapEntries; ++i) {        
         memdesc_t* desc = (memdesc_t*)((uint64_t)mem_info.mMap + (i * mem_info.mMapDescSize));
         kwrite(&defaultcanvas, hex2str((uint64_t)desc->physicalAddress), 0xA600CD);
@@ -53,7 +51,8 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
         kwrite(&defaultcanvas, MSEGMENT_TYPES[desc->type], 0xFD0C21);
         kwrite(&defaultcanvas, "\n", 0xFFFFFFFF);
     }
-    
-    // __asm__ __volatile__("int $0x0");    
+
+    // INTERRUPT ZONE.
+
     __asm__ __volatile__("cli; hlt");
 }
