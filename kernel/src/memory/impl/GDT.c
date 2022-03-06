@@ -1,7 +1,7 @@
 #include "../GDT.h"
 
 
-gdt_t gdt = {
+__attribute__((aligned(0x1000))) gdt_t gdt = {
     {0, 0, 0, 0x00, 0x00, 0},   // Null.
     {0, 0, 0, 0x9a, 0xa0, 0},   // Kernel data.
     {0, 0, 0, 0x92, 0xa0, 0},   // Kernel code.

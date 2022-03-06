@@ -26,7 +26,7 @@ typedef struct {
     gdt_entry_t usernull;
     gdt_entry_t usercode;
     gdt_entry_t userdata;
-} __attribute__((packed)) gdt_t;
+} __attribute__((aligned(0x1000))) __attribute__((packed)) gdt_t;
 extern gdt_t gdt;
 void loadGdt(gdt_desc_t* desc);
 
