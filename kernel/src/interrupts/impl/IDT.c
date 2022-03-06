@@ -17,7 +17,8 @@ void set_idt_entry(unsigned char entry, void* isr, unsigned char flags) {
     desc->isr_high = ((uint64_t)isr >> 32) & 0xFFFFFFFF;
     desc->reserved = 0;
     */
-
+    
+    /*
     uint64_t addr = (uint64_t)isr;
     idt[entry].isr_low = addr & 0xFFFF;
     idt[entry].isr_mid = (addr & 0xFFFF0000) >> 16;
@@ -25,6 +26,16 @@ void set_idt_entry(unsigned char entry, void* isr, unsigned char flags) {
     idt[entry].attr = flags;
     idt[entry].selector = 0x08;
     idt[entry].reserved = 0x0;
+    idt[entry].ist = 0;
+    */
+
+    uint64_t addr = (uint64_t)isr;
+    idt[entry].isr_low = addr & 0xFFFF;
+    idt[entry].isr_high = (addr >> 32) & 0xFFFFFFFF;
+    idt[entry].isr_mid = (addr >> 16) & 0xFFFF;
+    idt[entry].selector = 0x08;
+    idt[entry].reserved = 0x0;
+    idt[entry].attr = flags;
     idt[entry].ist = 0;
 }
 
