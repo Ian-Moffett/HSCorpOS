@@ -8,7 +8,7 @@ static void display_details(unsigned int idt_idx, int_frame_t* frame) {
     clearScreen(&defaultcanvas, 0xFF0000);
     kwrite(&defaultcanvas, "CPU EXCEPTION: ", 0xFFFFFFFF);
     kwrite(&defaultcanvas, hex2str(idt_idx), 0xFFFFFFFF);
-    kwrite(&defaultcanvas, "\n\n<==== DUMPING REGISTER STATE ====>\n", 0xFFFFFFFF);
+    kwrite(&defaultcanvas, "\n\n<==== DUMPING INTERRUPT FRAME ====>\n", 0xFFFFFFFF);
     kwrite(&defaultcanvas, "RIP: ", 0xFFFFFFFF);
     kwrite(&defaultcanvas, hex2str(frame->rip), 0xFFFFFFFF);
     kwrite(&defaultcanvas, "\n", 0xFFFFFFFF);
