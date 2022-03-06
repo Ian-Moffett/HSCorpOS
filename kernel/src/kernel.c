@@ -11,7 +11,7 @@ canvas_t defaultcanvas = {
 };
 
 void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
-    clearScreen(&defaultcanvas, 0x00000000);
+    // clearScreen(&defaultcanvas, 0x00000000);
 
     gdt_desc_t gdt_desc;
 
@@ -24,7 +24,6 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     defaultcanvas.font = font;
 
     uint64_t mMapEntries = mem_info.mMapSize / mem_info.mMapDescSize;
-
         
     kwrite(&defaultcanvas, "\n", 0xFFFFFFFF);
 
