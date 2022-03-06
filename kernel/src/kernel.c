@@ -13,15 +13,21 @@ canvas_t defaultcanvas = {
 };
 
 
+__attribute__((interrupt)) void dmmy_gpf_handler(int_frame_t*) { 
+    clearScreen(&defaultcanvas, 0xFFFFFFFF);
+    __asm__ __volatile__("cli; hlt");
+    while (1);
+}
+
+
 void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
-    gdt_desc_t gdt_desc;
+    static gdt_desc_t gdt_desc;
     gdt_desc.offset = (uint64_t)&gdt;
     gdt_desc.size = sizeof(gdt) - 1;
 
     loadGdt(&gdt_desc);
 
-
-    set_idt_entry(0x0, div_0_handler, TRAP_GATE_FLAGS);
+    set_idt_entry(0xD, dmmy_gpf_handler, INT_GATE_FLAGS);
     idt_install();
 
     defaultcanvas.lfb = lfb;

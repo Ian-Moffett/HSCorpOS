@@ -3,5 +3,5 @@
 
 
 __attribute__((interrupt)) void div_0_handler(int_frame_t* int_frame) {
-    while (1);
+    __asm__ __volatile__("cli; hlt");
 }
