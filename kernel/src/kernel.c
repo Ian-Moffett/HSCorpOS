@@ -11,6 +11,8 @@ canvas_t defaultcanvas = {
 };
 
 void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
+    clearScreen(&defaultcanvas, 0x00000000);
+
     gdt_desc_t gdt_desc;
 
     gdt_desc.offset = (uint64_t)&gdt;

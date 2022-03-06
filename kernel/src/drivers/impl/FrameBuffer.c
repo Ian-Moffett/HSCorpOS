@@ -34,3 +34,16 @@ void kwrite(canvas_t* canvas, const char* const STR, unsigned int color) {
         canvas->x += 8;
     }
 }
+
+
+
+void clearScreen(canvas_t* canvas, unsigned int color) {
+    uint64_t bytesPerScanline = canvas->lfb->ppsl * 4;
+
+    for (int vsl = 0; vsl < canvas->lfb->height; ++vsl) {
+        uint64_t pixPtrBase = (uint64_t)canvas->lfb->baseAddr + (bytesPerScanline * vsl);
+        for (uint32_t* pixelPtr = (uint32_t*)pixPtrBase; pixelPtr < (uint32_t*)(pixPtrBase + bytesPerScanline); ++pixelPtr) {
+            *pixelPtr = color;
+        }
+    }
+}
