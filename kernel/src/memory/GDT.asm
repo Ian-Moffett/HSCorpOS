@@ -2,7 +2,7 @@ global loadGdt
 
 bits 64
 loadGdt:
-    cli
+    ; cli
     lgdt [rdi]
     mov ax, 0x10
     mov ds, ax
@@ -13,8 +13,5 @@ loadGdt:
     pop rdi
     mov rax, 0x08
     push rax
-    push done
+    push rdi
     retfq
-
-done:
-    jmp rdi

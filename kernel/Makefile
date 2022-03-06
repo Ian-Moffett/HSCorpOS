@@ -6,7 +6,7 @@ LDS = link.ld
 CC = gcc
 ASMC = nasm
 
-CFLAGS = -ffreestanding -fshort-wchar
+CFLAGS = -ffreestanding -fshort-wchar -mgeneral-regs-only
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
 SRCDIR := src

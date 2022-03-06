@@ -1,6 +1,8 @@
 #include "drivers/FrameBuffer.h"
 #include "drivers/memory/meminfo.h"
 #include "memory/GDT.h"
+#include "interrupts/IDT.h"
+#include "interrupts/ISR.h"
 #include <stdint.h>
 
 
@@ -14,14 +16,13 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     // clearScreen(&defaultcanvas, 0x00000000);
 
     gdt_desc_t gdt_desc;
-
     gdt_desc.offset = (uint64_t)&gdt;
     gdt_desc.size = sizeof(gdt) - 1;
 
     loadGdt(&gdt_desc);
 
     defaultcanvas.lfb = lfb;
-    defaultcanvas.font = font;
+    defaultcanvas.font = font; 
 
     uint64_t mMapEntries = mem_info.mMapSize / mem_info.mMapDescSize;
         
