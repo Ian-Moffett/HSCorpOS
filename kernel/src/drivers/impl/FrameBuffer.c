@@ -20,9 +20,14 @@ void putChar(framebuffer_t* framebuffer, psf1_font_t* psf1_font, unsigned int co
 void kwrite(canvas_t* canvas, const char* const STR, unsigned int color) {
     for (int i = 0; i < strlen(STR); ++i) {
         if (STR[i] == '\n') {
-            canvas->x = 10;
-            canvas->y += 15;
+            canvas->x = canvas->prevX;
+            canvas->y += 20;
             continue;
+        }
+
+        if (canvas->y >= canvas->lfb->height) {
+            canvas->prevX += 300;
+            canvas->y = 10;
         }
 
         putChar(canvas->lfb, canvas->font, color, STR[i], canvas->x, canvas->y);

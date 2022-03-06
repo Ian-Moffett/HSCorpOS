@@ -30,6 +30,7 @@ typedef struct {
 typedef struct {
     unsigned int x;
     unsigned int y;
+    unsigned int prevX;
     framebuffer_t* lfb;
     psf1_font_t* font;
 } canvas_t;
