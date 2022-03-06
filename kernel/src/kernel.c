@@ -1,5 +1,6 @@
 #include "drivers/FrameBuffer.h"
 #include "drivers/memory/meminfo.h"
+#include "memory/GDT.h"
 #include <stdint.h>
 
 
@@ -9,6 +10,15 @@ canvas_t defaultcanvas = {
 };
 
 void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
+    gdt_desc_t gdt_desc;
+
+    gdt_desc.offset = (uint64_t)&gdt;
+    gdt_desc.size = sizeof(gdt) - 1;
+
+    loadGdt(&gdt_desc);
+
+    __asm__ __volatile__("cli; hlt");
+
     defaultcanvas.lfb = lfb;
     defaultcanvas.font = font;
 
@@ -21,5 +31,4 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
         kwrite(&defaultcanvas, MSEGMENT_TYPES[desc->type], 0xFD0C21);
         kwrite(&defaultcanvas, "\n", 0xFFFFFFFF);
     }
-
 }

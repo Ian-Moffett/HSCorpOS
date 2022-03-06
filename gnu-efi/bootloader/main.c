@@ -187,6 +187,7 @@ EFI_STATUS efi_main(EFI_HANDLE imageHandle, EFI_SYSTEM_TABLE* sysTable) {
 
 
             if (defaultFont != NULL) {
+                sysTable->BootServices->ExitBootServices(imageHandle, mMapKey);
                 kernel_entry(lfb, defaultFont, meminfo);
             } else {
                 Print(L"FONT_LOAD_FAILURE.\n");
