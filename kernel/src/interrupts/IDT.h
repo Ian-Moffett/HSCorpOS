@@ -8,22 +8,18 @@
 #define INT_GATE_USER_FLAGS 0xEE 
 
 typedef struct {
-    uint16_t isr_addr_low;
+    uint16_t isr_low;
     uint16_t selector;
-    uint8_t ist : 3;
-    uint8_t reserved : 5;
-    uint8_t attr : 4;
-    uint8_t zero1 : 1;
-    uint8_t dpl : 2;
-    uint8_t p : 1;
-    uint16_t isr_addr_middle;
-    uint32_t isr_addr_high;
-    uint32_t reserved2;
+    uint8_t ist;
+    uint8_t attr;
+    uint16_t isr_mid;
+    uint32_t isr_high;
+    uint32_t reserved;
 } __attribute__((packed)) idt_desc_t;
 
 
 typedef struct {
-    unsigned short limit;
+    uint16_t limit;
     uint64_t base;
 } __attribute__((packed)) idtr_t;
 
