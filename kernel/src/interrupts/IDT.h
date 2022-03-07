@@ -2,6 +2,7 @@
 #define IDT_H
 
 #include <stdint.h>
+#include "../drivers/PIC.h"
 
 #define TRAP_GATE_FLAGS 0x8F
 #define INT_GATE_FLAGS 0x8E

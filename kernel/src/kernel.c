@@ -1,5 +1,8 @@
 #include "drivers/FrameBuffer.h"
 #include "drivers/memory/meminfo.h"
+#include "drivers/keyboard.h"
+#include "drivers/IO.h"
+#include "drivers/PIC.h"
 #include "memory/GDT.h"
 #include "interrupts/IDT.h"
 #include "interrupts/ISR.h"
@@ -32,6 +35,7 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
 
     set_idt_entry(0xD, dmmy_gpf_handler, TRAP_GATE_FLAGS);
     set_idt_entry(0x0, div0_handler, TRAP_GATE_FLAGS);
+    set_idt_entry(0x21, kb_isr, INT_GATE_FLAGS);
     idt_install();
 
     // __asm__ __volatile__("int $0x0");
@@ -54,5 +58,11 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
 
     // INTERRUPT ZONE.
     
-    __asm__ __volatile__("cli; hlt");
+    outportb(PIC1_DATA, inportb(PIC1_DATA) ^ (1 << 1));
+    outportb(PIC2_DATA, inportb(PIC2_DATA) ^ (1 << 1));
+    __asm__ __volatile__("sti");
+
+    while (1) {
+        __asm__ __volatile__("hlt");
+    }
 }

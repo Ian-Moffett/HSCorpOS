@@ -4,7 +4,7 @@
 extern canvas_t defaultcanvas;
 
 
-static void display_details(unsigned int idt_idx, int_frame_t* frame) {
+void display_details(unsigned int idt_idx, int_frame_t* frame) {
     clearScreen(&defaultcanvas, 0xFF0000);
     kwrite(&defaultcanvas, "CPU EXCEPTION: ", 0xFFFFFFFF);
     kwrite(&defaultcanvas, hex2str(idt_idx), 0xFFFFFFFF);
