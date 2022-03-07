@@ -16,6 +16,12 @@ canvas_t defaultcanvas = {
     .prevX = 10,
 };
 
+canvas_t mouse_canvas = {
+    .x = 10,
+    .y = 10,
+    .prevX = 10,
+};
+
 
 __attribute__((interrupt)) void dmmy_gpf_handler(int_frame_t*) { 
     clearScreen(&defaultcanvas, 0xFFFFFFFF);

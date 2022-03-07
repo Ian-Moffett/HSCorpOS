@@ -40,7 +40,6 @@ void kwrite(canvas_t* canvas, const char* const STR, unsigned int color) {
 }
 
 
-
 void clearScreen(canvas_t* canvas, unsigned int color) {
     uint64_t bytesPerScanline = canvas->lfb->ppsl * 4;
 
