@@ -66,8 +66,9 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     // INTERRUPT ZONE.
         
     mouse_init();
-    outportb(PIC1_DATA, 0b00000001);
-    outportb(PIC2_DATA, 0b00000000);
+    outportb(PIC1_DATA, 0x0);
+    outportb(PIC1_DATA, inportb(PIC1_DATA) | 0x1);
+    outportb(PIC2_DATA, 0x0);
 
     __asm__ __volatile__("sti");
 
