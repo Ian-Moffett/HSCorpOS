@@ -16,12 +16,6 @@ canvas_t defaultcanvas = {
     .prevX = 10,
 };
 
-__attribute__((interrupt)) void test(int_frame_t*) {
-    kwrite(&defaultcanvas, "A", 0xFFFFFFFF);
-    inportb(0x60);      // ACK.
-    pic_sendEOI(12);
-}
-
 
 __attribute__((interrupt)) void dmmy_gpf_handler(int_frame_t*) { 
     clearScreen(&defaultcanvas, 0xFFFFFFFF);
@@ -40,7 +34,7 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     set_idt_entry(0xD, dmmy_gpf_handler, TRAP_GATE_FLAGS);
     set_idt_entry(0x0, div0_handler, TRAP_GATE_FLAGS);
     set_idt_entry(0x21, kb_isr, INT_GATE_FLAGS);
-    set_idt_entry(0x2C, test, INT_GATE_FLAGS);
+    set_idt_entry(0x2C, mouse_isr, INT_GATE_FLAGS);
     idt_install();
 
     // __asm__ __volatile__("int $0x0");

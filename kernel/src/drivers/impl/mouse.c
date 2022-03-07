@@ -1,5 +1,10 @@
 #include "../mouse.h"
 
+__attribute__((interrupt)) void mouse_isr(int_frame_t*) {
+    inportb(0x60);      // ACK.
+    pic_sendEOI(12);
+}
+
 
 static void mouse_wait() {
     uint64_t timeout = 100000;
