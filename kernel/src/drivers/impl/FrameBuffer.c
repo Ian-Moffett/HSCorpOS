@@ -28,6 +28,10 @@ void kwrite(canvas_t* canvas, const char* const STR, unsigned int color) {
         if (canvas->y >= canvas->lfb->height) {
             canvas->prevX += 300;
             canvas->y = 10;
+        } else if (canvas->x >= canvas->lfb->width) {
+            canvas->prevX = 10;
+            canvas->x = 10;
+            canvas->y += 20;
         }
 
         putChar(canvas->lfb, canvas->font, color, STR[i], canvas->x, canvas->y);

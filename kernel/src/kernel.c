@@ -49,11 +49,13 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     kwrite(&defaultcanvas, "\n", 0xFFFFFFFF);
 
     for (int i = 0; i < mMapEntries; ++i) {        
+        #ifdef DUMP_SEGMENTS
         memdesc_t* desc = (memdesc_t*)((uint64_t)mem_info.mMap + (i * mem_info.mMapDescSize));
         kwrite(&defaultcanvas, hex2str((uint64_t)desc->physicalAddress), 0xA600CD);
         kwrite(&defaultcanvas, " => ", 0xFFFFFFFF);
         kwrite(&defaultcanvas, MSEGMENT_TYPES[desc->type], 0xFD0C21);
         kwrite(&defaultcanvas, "\n", 0xFFFFFFFF);
+        #endif
     }
 
     // INTERRUPT ZONE.
