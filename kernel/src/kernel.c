@@ -3,6 +3,7 @@
 #include "drivers/keyboard.h"
 #include "drivers/IO.h"
 #include "drivers/PIC.h"
+#include "drivers/mouse.h"
 #include "memory/GDT.h"
 #include "interrupts/IDT.h"
 #include "interrupts/ISR.h"
@@ -15,7 +16,10 @@ canvas_t defaultcanvas = {
     .prevX = 10,
 };
 
-void test() {
+__attribute__((interrupt)) void test(int_frame_t*) {
+    kwrite(&defaultcanvas, "A", 0xFFFFFFFF);
+    inportb(0x60);      // ACK.
+    pic_sendEOI(12);
 }
 
 
@@ -36,6 +40,7 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     set_idt_entry(0xD, dmmy_gpf_handler, TRAP_GATE_FLAGS);
     set_idt_entry(0x0, div0_handler, TRAP_GATE_FLAGS);
     set_idt_entry(0x21, kb_isr, INT_GATE_FLAGS);
+    set_idt_entry(0x2C, test, INT_GATE_FLAGS);
     idt_install();
 
     // __asm__ __volatile__("int $0x0");
@@ -59,9 +64,11 @@ void _start(framebuffer_t* lfb, psf1_font_t* font, memory_info_t mem_info) {
     }
 
     // INTERRUPT ZONE.
-    
-    outportb(PIC1_DATA, inportb(PIC1_DATA) ^ (1 << 1));
-    outportb(PIC2_DATA, inportb(PIC2_DATA) ^ (1 << 1));
+        
+    mouse_init();
+    outportb(PIC1_DATA, 0b00000001);
+    outportb(PIC2_DATA, 0b00000000);
+
     __asm__ __volatile__("sti");
 
     while (1) {

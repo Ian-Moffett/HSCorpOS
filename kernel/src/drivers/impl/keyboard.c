@@ -20,6 +20,9 @@ static bool special_key(char c) {
 __attribute__((interrupt)) void kb_isr(int_frame_t* frame) {
     int scancode = inportb(0x60);
 
+    
+    kwrite(&defaultcanvas, "A", 0xA600CD);
+
     if (!(scancode & 0x80)) {           // If just key press.
         char c = SC_ASCII[scancode];
 
